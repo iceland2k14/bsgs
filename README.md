@@ -19,12 +19,11 @@ Time Spent : 136.67 seconds
 
 (base) C:\anaconda3>python bsgs_algo_modified_multi.py
 Read 3 pubkeys from file
-
 Found the Baby Steps Table file: baby_steps_table.txt. Will be used directly
 Checking 100000000000000 keys from 0x1
 BSGS FOUND PrivateKey  : 0x1d3
 BSGS FOUND PrivateKey  : 0x1312b2f
 BSGS FOUND PrivateKey  : 0x17e2551e
+Time Spent : 15.90 seconds. Speed 6269146771029.28 Keys/s
 All PrivateKeys Found. Finished Searching
-Time Spent : 15.90 seconds
 ```
