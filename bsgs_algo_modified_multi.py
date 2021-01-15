@@ -16,7 +16,7 @@ f1 = 'test_pubkeys.txt'
 
 publist = [line.split()[0] for line in open(f1,'r')]
 total_pubkeys = len(publist)
-print('Read {0} pubkeys from file'.format(total_pubkeys))
+print('Read {0} pubkeys from Target file'.format(total_pubkeys))
 
 
 def Pub2Point(public_key):
@@ -44,14 +44,13 @@ def create_table(m):
         P = P + G
     return baby_steps
 
-#baby_steps = set(baby_steps)
 ###############################################################################
 
 m = 10000000    # default value
 
 valid = os.path.isfile(bs_file)
 if valid == True:
-    print('\nFound the Baby Steps Table file: '+bs_file+'. Will be used directly')
+    print('Found the Baby Steps Table file: '+bs_file+'. Will be used directly')
 #    baby_steps = [int(line.split()[0],10) for line in open(bs_file,'r')]
     baby_steps = {int(line.split()[0],10):k for k, line in enumerate(open(bs_file,'r'))}
     if m != len(baby_steps): 
@@ -76,9 +75,16 @@ def lookup_in_baby_steps(S_list, k1, step, total_found_keys):
     if intersection != set():
         for line in intersection:
             b = baby_steps.get(line)
+#            print('line', hex(line))
+#            print('step', step)
+#            print('b', b)
+#            print('k1', k1)
             print("BSGS FOUND PrivateKey  : {0}".format(hex(k1 + step + b + 1)))
             total_found_keys += 1
-    return total_found_keys
+            del S_list[Sx_dict.get(line)]
+            del Sx_dict[line]
+            
+    return S_list, total_found_keys
 
 def lookup_in_infinity(S_list, k1, step, total_found_keys):
     for line in S_list:
@@ -95,12 +101,12 @@ def findkeys(PointList, k1, k2, k1G, mG, total_found_keys):
     total_found_keys = nb_keys
     
     while total_found_keys <  total_pubkeys and step<(1+k2-k1):
-        nb_keys = lookup_in_baby_steps(S, k1, step, total_found_keys)
+        S, nb_keys = lookup_in_baby_steps(S, k1, step, total_found_keys)
         total_found_keys = nb_keys
         S = [pp - mG for pp in S]   # Giant step
         step = step + m
             
-    return total_found_keys
+    return PointList, total_found_keys
 ###############################################################################
 total_found_keys = 0
 
@@ -116,9 +122,10 @@ while total_found_keys < total_pubkeys:
     k1G = k1 * G
     mG = m * G
     
-    total_found_keys = findkeys(Qlist, k1, k2, k1G, mG, total_found_keys)
-else:
-    print('All PrivateKeys Found. Finished Searching')
+    Qlist, total_found_keys = findkeys(Qlist, k1, k2, k1G, mG, total_found_keys)
+    time_taken = time.time()-st
+    print("Time Spent : {0:.2f} seconds. Speed {1:.2f} Keys/s".format(time_taken, (k2-k1)/time_taken))
+    st = time.time()
 
+print('All PrivateKeys Found. Finished Searching')
 
-print("Time Spent : {0:.2f} seconds".format(time.time()-st))
