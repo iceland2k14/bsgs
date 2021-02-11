@@ -32,6 +32,15 @@ class Point:
 		else:
 			return 'X: 0x{:x}\nY: 0x{:x}'.format(self.x, self.y)
 # =============================================================================        
+	def __unicode__(self) -> str:
+		return self.__str__()
+# =============================================================================     
+	def __repr__(self) -> str:
+		return self.__str__()
+# =============================================================================
+	def __eq__(self, other) -> bool:
+		return self.x == other.x and self.y == other.y
+# =============================================================================        
 	def __add__(self, other):
 		if self == self.IDENTITY_ELEMENT:
 			return other
@@ -79,6 +88,9 @@ Point.IDENTITY_ELEMENT = Point(0, 0)  # also known as the point at infinity
 # =============================================================================
 
 def Point_Addition(A, B, p=modulo):
+	if A == Point.IDENTITY_ELEMENT: return B
+	if B == Point.IDENTITY_ELEMENT: return A
+	if A == -B: return Point.IDENTITY_ELEMENT
 	if A.x == B.x and A.y == B.y: return Point_Doubling(A, p=modulo)
 	R = Point()
 	dx = B.x - A.x

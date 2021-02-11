@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+Usage :
+ > python bsgs_v4_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -n 20000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
 
 @author: iceland
 """
@@ -9,11 +11,33 @@ import gmp_ec as ec
 import bit
 import os
 import sys
+import argparse
 
 
-bs_file = 'bPfile.bin'
+parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching 1 pubkey in the given range', epilog='Enjoy the program! :)    Tips: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at')
+parser.version = '11022021'
+parser.add_argument("-p", "--pubkey", help = "Public Key in hex format (compressed or uncompressed)", required=True)
+parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile.py", required=True)
+parser.add_argument("-n", help = "Total sequential search in 1 loop. default=20000000000000", action='store')
+parser.add_argument("-keyspace", help = "Keyspace Range ( hex ) to search from min:max. default=1:order of curve / 2", action='store')
+parser.add_argument("-rand", help = "Start from a random value in the given range from min:max", action="store_true")
 
-public_key = '02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630'
+if len(sys.argv)==1:
+    parser.print_help()
+    sys.exit(1)
+args = parser.parse_args()
+
+
+seq = int(args.n) if args.n else 20000000000000
+ss = args.keyspace if args.keyspace else '1:7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0'
+flag_random = True if args.rand else False
+bs_file = args.bpfile       # 'bPfile.bin'
+public_key = args.pubkey    # '02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630'
+###############################################################################
+a, b = ss.split(':')
+a = int(a, 16)
+b = int(b, 16)
+
 
 if os.path.isfile(bs_file) == False:
     print('File {} not found'.format(bs_file))
@@ -22,17 +46,19 @@ if os.path.isfile(bs_file) == False:
 # ======== 1st Part : File ===============
 N2 = 0X7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
 
-a = 0x800000000000000000000000000000
-b = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-seq = 8000000000000
 # m = 40000000     # m = math.floor(math.sqrt(k2-k1))
 m = int((os.stat(bs_file).st_size)/32)      # each xpoint is 32 bytes in the file
-rrrr = 21
+lastitem = 0
 
 ###############################################################################
 def randk(a, b):
-	return random.SystemRandom().randint(a, b)
-#    return a
+	if flag_random:
+		return random.SystemRandom().randint(a, b)
+	else:
+		if lastitem == 0:
+			return a
+		else:
+			return lastitem + 1
 
 def scan_str(num):
 	# Kilo/Mega/Giga/Tera/Peta/Exa/Zetta/Yotta
@@ -78,17 +104,17 @@ baby_steps = set(baby_steps)
 
 # We have to solve P = k.G, we know that k lies in the range ]k1,k2]
 k1 = randk(a, b) # start from
-# k1 = 1
 k2 = k1 + seq
 
 
 print('[+] seq value:',seq,'   m value :' , m)
 G = ec.G
-
+Zp = ec.Point.IDENTITY_ELEMENT
+print('[+] Search Range:',hex(a),' to ', hex(b))
 ###############################################################################
 
 
-print('[+] k1:', hex(k1))
+print('                                                                [+] k1:', hex(k1))
 
 
 k1G = ec.Scalar_Multiplication(k1, G)
@@ -98,8 +124,12 @@ st = time.time()
 #################################
 
 def bsgs_keys(pubkey_point, k1, k2):
+    found = False
     S = ec.Point_Addition(pubkey_point, -k1G)
-    if S == ec.Point.IDENTITY_ELEMENT: return k1
+    if S == Zp:
+        print('PVK found ', hex(k1))
+        found = True
+        return found
     
     found = False
     step = 0
@@ -119,7 +149,7 @@ def bsgs_keys(pubkey_point, k1, k2):
     return found
 
 el = 0
-for kk in range(rrrr):
+while True:
     found = bsgs_keys(Q, k1, k2)
     if found == True:
         print("BSGS FOUND PrivateKey   ")
@@ -129,8 +159,9 @@ for kk in range(rrrr):
     else:
         curr = time.time() - st
         el += curr
+        lastitem = k2
         k1 = randk(a, b)
-        print('PVK not found. {0} scanned in {1:.2f} sec. New range [+] k1:{2}'.format(scan_str(seq), curr, hex(k1)))
+        print('PVK not found. {0} scanned in {1:.2f} sec. New range [+] k1: {2}'.format(scan_str(seq), curr, hex(k1)))
         st = time.time()
         k2 = k1 + seq
         k1G = ec.Scalar_Multiplication(k1, G)
