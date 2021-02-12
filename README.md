@@ -5,10 +5,12 @@ Python3 implementation Using 1 thread.
 First time the program will create a table file in the same folder with name "baby_steps_table.txt" and will take some time.
 Next time onwards this file will be directly used.
 
-Use bsgs_v4_gmp.py for 1 pubkey search. Older version is bsgs_algo_modified.py.
+Use bsgs_v4_gmp.py for 1 pubkey search. New Version is faster. Thanks to AlbertoBSD for a lot of discussion and help :) 
+
+Older version is bsgs_algo_modified.py.
 Use bsgs_algo_modified_multi.py for many pubkey search from a text file.
 
-Tips: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at
+[Tips : bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at ]
 
 # Run
 ```
@@ -28,6 +30,8 @@ BSGS FOUND PrivateKey  : 0x17e2551e
 BSGS FOUND PrivateKey  : 0x98fddfe4
 Time Spent : 15.90 seconds. Speed 6269146771029.28 Keys/s
 All PrivateKeys Found. Finished Searching
+
+
 
 (base) C:\anaconda3>python bsgs_v4_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -n 500000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
 [+] Starting Program : BSGS mode
