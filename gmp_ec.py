@@ -122,8 +122,6 @@ def Scalar_Multiplication(k, A=G, p=modulo):
 
 # =============================================================================
 
-def checkbit(number, bitk):
-    return bin(number)[2:].zfill(256)[-bitk] == '1'
 # =============================================================================
 
 def create_xpoint_table(start_value, end_value):
@@ -167,7 +165,7 @@ def bulkInversionModP(in_list):
             in_list[i] = inverse
     return in_list
 # =============================================================================
-# a small bug currently. don't use it.
+
 def generateKeyPairsBulk(pvk_list):
     count = len(pvk_list)
     
@@ -184,7 +182,7 @@ def generateKeyPairsBulk(pvk_list):
 #        // calculate (Px - Qx)
         for j in range(count):
             k = pvk_list[j]
-            if checkbit(k, i):
+            if gmpy2.bit_test(k, i):
                 if pub_list[j] == Point.IDENTITY_ELEMENT:
                     run = 2
                 else:
@@ -199,7 +197,7 @@ def generateKeyPairsBulk(pvk_list):
 #       // complete the addition
         for j in range(count):
             k = pvk_list[j]
-            if checkbit(k, i):
+            if gmpy2.bit_test(k, i):
                 if pub_list[j] == Point.IDENTITY_ELEMENT:
                     pub_list[j] = table[i]
                 else:
