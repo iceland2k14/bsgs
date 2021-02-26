@@ -38,8 +38,10 @@ print('\n[+] Program Running please wait...')
 seq = range(1, total+1)
 parts_list = [seq[i * chunk:(i * chunk) + chunk] for i in range(math.ceil(len(seq) / chunk))]
 
-
+print('[+] Created {} Chunks ...'.format(len(parts_list)))
+k = 1
 for piece in parts_list:
+    print('[+] Working on Chunk {} ...'.format(k), end='\r')
     start_value = min(piece)
     end_value = max(piece)
     baby_steps = create_table(start_value, end_value)
@@ -47,6 +49,7 @@ for piece in parts_list:
         out.write(bytes.fromhex(hex(line)[2:].zfill(64)))
     out.flush()
     os.fsync(out.fileno())
+    k += 1
 
 out.close()
 print('[+] File created successfully\n')
