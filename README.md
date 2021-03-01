@@ -10,7 +10,6 @@ Use bsgs_v4_gmp.py for 1 pubkey search. New Version is faster. Thanks to Alberto
 Older version is bsgs_algo_modified.py.
 Use bsgs_algo_modified_multi.py for many pubkey search from a text file.
 
-[Tips : bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at ]
 
 # Run
 ```
@@ -68,4 +67,10 @@ PVK not found. 500.00000 Billion scanned in 0.22 sec. New range [+] k1: 0xac43ca
 PVK not found. 500.00000 Billion scanned in 0.21 sec. New range [+] k1: 0xcc731c81f662f6802cc96c3267a487
 PVK not found. 500.00000 Billion scanned in 0.18 sec. New range [+] k1: 0xf18a4b5982a5261f6382776f981dd2
 PVK not found. 500.00000 Billion scanned in 0.18 sec. New range [+] k1: 0xf1c99d852a2f853f5eb188de8c2b2f
+```
+**IceLand **
+```
+BTC:	bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at
+ETH:	0xa74fC23f07A33B90d6848dF0bb409bEA5Ac16b28
+DOGE:	D5Wh5bQMc3XVGdLbjJbGjryjNom5tZY6dD
 ```
