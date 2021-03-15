@@ -69,36 +69,35 @@ PVK not found. 500.00000 Billion scanned in 0.18 sec. New range [+] k1: 0xbdf6b4
 PVK not found. 500.00000 Billion scanned in 0.18 sec. New range [+] k1: 0xdb7966c2f393ef3a13df463ed38ee6
 
 
-(base) C:\anaconda3>python bsgs_v5_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -bl Bigbloomfilter.bin -n 5000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
+(base) C:\anaconda3>python bsgs_v5_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -bl Bigbloomfilter.bin -n 5000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
 [+] Starting Program : BSGS mode
-[+] Reading bloom filter from file complete in : 2.05280 sec
+[+] Reading bloom filter from file complete in : 1.89686 sec
+[+] Reading Baby table from file complete in : 0.00000 sec
 [+] seq value: 5000000000000    m value : 400000000
 [+] Search Range: 0x800000000000000000000000000000  to  0xffffffffffffffffffffffffffffff
-                                                               [+] k1: 0xb58ff37d5f981645cd6e56b185cb30
-PVK not found. 5.00000 Trillion scanned in 0.35 sec. New range [+] k1: 0xa3f2d31a09e68bc678645fdcc5a14e
-PVK not found. 5.00000 Trillion scanned in 0.33 sec. New range [+] k1: 0xc395ee9a85466273a4ca114fb64965
-PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0x98052c0921e0b10ccee4ab83f63cbe
-PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0xc83f634ef6ca0917c1e9d40e973ac2
-PVK not found. 5.00000 Trillion scanned in 0.36 sec. New range [+] k1: 0xbece9fdf4bcec3fdece41d3c2bc28e
-PVK not found. 5.00000 Trillion scanned in 0.35 sec. New range [+] k1: 0x93e086ffea6fc89958b5031098d539
-PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0xa27d8617a10eeb649e89cff01740a1
-PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0x92134abb1bf8a98c7f84550705d7a2
-PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0x995c8f130ec7f7b506b0c4086502f3
-PVK not found. 5.00000 Trillion scanned in 0.42 sec. New range [+] k1: 0xe6d830742b3f29265f670d6223adb0
-PVK not found. 5.00000 Trillion scanned in 0.35 sec. New range [+] k1: 0xc64ce1429698200cdd9187a1143b13
-PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0x854d4562eb2a355a9eaa8421f8b15d
-PVK not found. 5.00000 Trillion scanned in 0.35 sec. New range [+] k1: 0x996525dd050224464fa4be25180203
-PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0xa99ca78d22afbc305f2199d4e27ccf
-PVK not found. 5.00000 Trillion scanned in 0.37 sec. New range [+] k1: 0xbd89677b1ab835c496beb019fc0230
-PVK not found. 5.00000 Trillion scanned in 0.34 sec. New range [+] k1: 0xe4d3dcd5db60d837f26a67922e8e4d
-PVK not found. 5.00000 Trillion scanned in 0.34 sec. New range [+] k1: 0xbdfe968df6c7b63ccc254060284472
-PVK not found. 5.00000 Trillion scanned in 0.36 sec. New range [+] k1: 0xa5a8aaf4e5741226b6c03d62d9118b
-PVK not found. 5.00000 Trillion scanned in 0.33 sec. New range [+] k1: 0x9e8a4f03cd05e8e47695dea01a0c18
-PVK not found. 5.00000 Trillion scanned in 0.38 sec. New range [+] k1: 0xdc651933ff2703b24c0fb80044e0a5
-PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0xb432ca6d398781dedf0adb4da7777d
-PVK not found. 5.00000 Trillion scanned in 0.37 sec. New range [+] k1: 0xa15780af9e12f5567d6f57a13286de
-PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0xfda61a4030417cd17986d72cd2961f
-PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0xb65c49aa73cc80e41700ab21d19ff7
+                                                               [+] k1: 0xf86438d726027e9ce24b14afebef1d
+PVK not found. 5.00000 Trillion scanned in 0.31 sec. New range [+] k1: 0xc6091f4cbc596952abdd10a4e010d7
+PVK not found. 5.00000 Trillion scanned in 0.38 sec. New range [+] k1: 0xed3526a5934b5a3609ee9f8a439f89
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0xb46916db3856d7ff5160f2a4a8623b
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0x9605fe55f55b0583b330980a9b17d8
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xfb6f2853eab745b3a3983fed06bded
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0x89f6195bbb33bdc7676862ab41836c
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0xcbb62284cd23839a4983c3cd2be5ca
+PVK not found. 5.00000 Trillion scanned in 0.38 sec. New range [+] k1: 0xb9c40cfa21e4658a6e764cee4c0dbf
+PVK not found. 5.00000 Trillion scanned in 0.39 sec. New range [+] k1: 0xe6e41a71365becee1eb4589215b842
+PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0xd883d99e66de8fd9b9b4c4a4ba2fb3
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xe90449e4ac03035405f1c52c91c20a
+PVK not found. 5.00000 Trillion scanned in 0.38 sec. New range [+] k1: 0xd058c0fc79ad35100da6abd29c0118
+PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0xb440a8b62fd6936e4fcd2b385f1691
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xcb4f21d3d0fbcf4a600db1e619b4fd
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0xf026cd847a65406927b0ac51cf0cb5
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xf474efec161c6e82bdf8c64efded14
+PVK not found. 5.00000 Trillion scanned in 0.37 sec. New range [+] k1: 0xbf244acf96273a1371c4981b708b91
+PVK not found. 5.00000 Trillion scanned in 0.32 sec. New range [+] k1: 0x9f0fcf2610be550a283471d310dc37
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0x8e8e19f457173e03e02f54fd2cc1de
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xd933f4bc214e97d702beea6006e6b0
+PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xf77f7278069cd96b09e0ec82a10557
+PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0xed1423b6a6c9d7f7b3bfe18c32f1a9
 
 ```
 **IceLand **
