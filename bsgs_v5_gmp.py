@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Usage :
- > python bsgs_v5_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -bl Bigbloomfilter.bin -n 20000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
+ > python bsgs_v5_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -bl Bigbloomfilter.bin -n 20000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
 
 @author: iceland
 """
 import time
 import random
-import gmpy2
-import gmp_ec as ec
+# import gmpy2
 import bit
 import os
 import math
@@ -16,13 +15,14 @@ import sys
 import argparse
 from bitarray import bitarray
 import xxhash
-
+import gmp_ec as ec
 
 parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching 1 pubkey in the given range', 
                                  epilog='Enjoy the program! :)    Tips BTC: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at \
                                  \nThanks a lot to AlbertoBSD Tips BTC: 1ABSD1rMTmNZHJrJP8AJhDNG1XbQjWcRz7')
-parser.version = '07032021'
+parser.version = '15032021'
 parser.add_argument("-p", "--pubkey", help = "Public Key in hex format (compressed or uncompressed)", required=True)
+parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile.py", required=True)
 parser.add_argument("-bl", "--bloomfile", help = "Bloom filter file. created using bPfile_2_bloom.py", required=True)
 parser.add_argument("-n", help = "Total sequential search in 1 loop. default=20000000000000", action='store')
 parser.add_argument("-keyspace", help = "Keyspace Range ( hex ) to search from min:max. default=1:order of curve / 2", action='store')
@@ -37,6 +37,7 @@ args = parser.parse_args()
 seq = int(args.n) if args.n else 20000000000000
 ss = args.keyspace if args.keyspace else '1:7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0'
 flag_random = True if args.rand else False
+bs_file = args.bpfile       # 'FULLbpfile.bin'
 bloom_file = args.bloomfile # 'FULLbloomfilter.bin'
 public_key = args.pubkey    # '02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630'
 ###############################################################################
@@ -49,11 +50,15 @@ if os.path.isfile(bloom_file) == False:
     print('File {} not found'.format(bloom_file))
     print('create it from : bPfile_2_bloom.py')
     sys.exit()
+if os.path.isfile(bs_file) == False:
+    print('File {} not found'.format(bs_file))
+    print('Specify the file used to create the bloom filter or create it from : create_bPfile.py. Even little smaller file is OK.')
+    sys.exit()
 # ======== 1st Part : File ===============
 N2 = 0X7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
 
 # m = 40000000     # m = math.floor(math.sqrt(k2-k1))
-# m = int((os.stat(bs_file).st_size)/32)      # each xpoint is 32 bytes in the file
+m_bb = int((os.stat(bs_file).st_size)/32)      # each xpoint is 32 bytes in the file
 lastitem = 0
 
 ###############################################################################
@@ -86,15 +91,13 @@ def pub2point(pub_hex):
 	return ec.Point(x, y)
 
 
-# =============================================================================
-# def read_FULL_baby_file():
-# #    a = array('B')
-# #    elem = int((os.stat(bs_file).st_size)/3)
-#     with open(bs_file,'rb') as f:
-#         a = bytearray(f.read())
-# #        a.fromfile(f, elem)
-#     return a
-# =============================================================================
+def read_FULL_baby_file(num_bytes):
+#    a = array('B')
+#    elem = int((os.stat(bs_file).st_size)/3)
+    with open(bs_file,'rb') as f:
+        a = bytearray(f.read(num_bytes))
+#        a.fromfile(f, elem)
+    return a
 
 def bloom_read_from_file():
     a = bitarray()
@@ -131,14 +134,19 @@ bloom_prob = 0.000000001                # False Positive = 1 out of 1 billion
 bloom_bpe = -(math.log(bloom_prob) / 0.4804530139182014)
 m = math.floor(bloom_bits/bloom_bpe)
 # =============================================================================
+w = math.ceil(math.sqrt(m))         # secondary table elements needed
+if w > m_bb:
+    print('[*] Warning. Small bPfile found. Is it ok ? Proceeding...')
+    w = m_bb
+# =============================================================================
 #bloom_filter_gmp = gmpy2.xmpz(int.from_bytes(bloom_filter.tobytes(), byteorder='big'))
 #del bloom_filter
-
 # =============================================================================
-# baby_bin = read_FULL_baby_file()
-# print('[+] Reading Baby table from file complete in : {0:.5f} sec'.format(time.time() - st))
-# st = time.time()
-# baby_steps = [baby_bin[cnt*32:cnt*32+32].hex() for cnt in range(m)]
+baby_bin = read_FULL_baby_file(w*32)
+print('[+] Reading Baby table from file complete in : {0:.5f} sec'.format(time.time() - st))
+st = time.time()
+# baby_steps = [baby_bin[cnt*32:cnt*32+32].hex() for cnt in range(w)]
+# baby_steps = {int(line,10):k for k, line in enumerate(baby_steps)}
 # baby_steps = set(baby_steps)
 # =============================================================================
 
@@ -163,41 +171,48 @@ mG = ec.Scalar_Multiplication(m, G)
 st = time.time()
 
 ###############################################################################
-def secondary_table(end_value):
-    P = G
-    baby_steps = []
-    for i in range(1, end_value):
-        baby_steps.append(P.x)
-        P = ec.Point_Addition(P, G)
-    baby_steps.append(P.x)              # last element
-    return baby_steps
+# =============================================================================
+# def secondary_table(end_value):
+#     P = G
+#     baby_steps = []
+#     for i in range(1, end_value):
+#         baby_steps.append(P.x)
+#         P = ec.Point_Addition(P, G)
+#     baby_steps.append(P.x)              # last element
+#     return baby_steps
+# =============================================================================
 
-def bsgs_exact_key(pubkey_point, z1, z2, w, bb_table):
+def bsgs_exact_key(pubkey_point, z1, z2):
     z1G = z1 * G
     wG = w * G
-    S = pubkey_point - z1G
+    S = pubkey_point -z1G
     if S == Zp:
-        print('BSGS Exact PrivateKey = ', hex(z1))
-        return
+        if z1 * G == pubkey_point:
+            print('BSGS FOUND PrivateKey ', hex(z1))
+            exit()
     stp = 0
     while stp<(1+z2-z1):
-        if S.x in bb_table:
-            b = bb_table.get(S.x)
-            print('BSGS Exact PrivateKey = ', hex(z1 + stp + b + 1))
-            return
+        hex_line = hex(S.x)[2:].zfill(64)
+        idx = baby_bin.find(bytes.fromhex(hex_line), 0)
+        if idx > 0:
+            print('============== KEYFOUND ==============')
+            print('BSGS FOUND PrivateKey ',hex(z1+stp+int(idx/32)+1))
+            print('======================================')
+            exit()
+                
         else:
             # Giant step
             S = S - wG
             stp = stp + w
-    print('Missed something in Exact search. use bsgs_v4_gmp.py script to find in the above printed range')
-    
+    print('A False collision ignored')
+
 #################################
 
 def bsgs_keys(pubkey_point, k1, k2):
     found = False
     S = ec.Point_Addition(pubkey_point, -k1G)
     if S == Zp:
-        print('PVK found ', hex(k1))
+        print('BSGS FOUND PrivateKey ', hex(k1))
         found = True
         return found
     
@@ -207,21 +222,12 @@ def bsgs_keys(pubkey_point, k1, k2):
     while found is False and step<(1+k2-k1):
         hex_line = hex(S.x)[2:].zfill(64)
         if check_in_bloom(hashit(hex_line, bloom_hashes, bloom_bits), bloom_bits, bloom_filter) == True:
-            print('============== KEYFOUND ==============')
-            print('BSGS FOUND PrivateKey between ',hex(k1+step), ' and ', hex(k1+step+m))
-            print('======================================')
-            print('Launching secondary scan for exact match of the key in between this range...')
-            w = math.ceil(math.sqrt(m))
-            bb_table = secondary_table(w)
-            bb_table = {line:k for k, line in enumerate(bb_table)}
-            bsgs_exact_key(pubkey_point, k1+step, k1+step+m, w, bb_table)
-            exit()
-# =============================================================================
-#         if hex_line in baby_steps:
-#             idx = baby_bin.find(bytes.fromhex(hex_line), 0)
-#             print('PVK found ', hex(k1+step+int(idx/32)+1))
-#             found = True
-#             break
+            bsgs_exact_key(pubkey_point, k1+step, k1+step+m)
+                
+#            print('A False collision ignored between ',hex(k1+step), ' and ', hex(k1+step+m))
+            S = ec.Point_Addition(S, -mG)
+            step = step + m
+            
 # =============================================================================
 
         else: # Giant step
