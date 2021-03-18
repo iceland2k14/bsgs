@@ -20,7 +20,7 @@ import gmp_ec as ec
 parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching 1 pubkey in the given range', 
                                  epilog='Enjoy the program! :)    Tips BTC: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at \
                                  \nThanks a lot to AlbertoBSD Tips BTC: 1ABSD1rMTmNZHJrJP8AJhDNG1XbQjWcRz7')
-parser.version = '15032021'
+parser.version = '18032021'
 parser.add_argument("-p", "--pubkey", help = "Public Key in hex format (compressed or uncompressed)", required=True)
 parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile.py", required=True)
 parser.add_argument("-bl", "--bloomfile", help = "Bloom filter file. created using bPfile_2_bloom.py", required=True)
@@ -195,10 +195,15 @@ def bsgs_exact_key(pubkey_point, z1, z2):
         hex_line = hex(S.x)[2:].zfill(64)
         idx = baby_bin.find(bytes.fromhex(hex_line), 0)
         if idx > 0:
-            print('============== KEYFOUND ==============')
-            print('BSGS FOUND PrivateKey ',hex(z1+stp+int(idx/32)+1))
-            print('======================================')
-            exit()
+            kk = z1+stp+int(idx/32)+1
+            if kk * G == pubkey_point:
+                print('============== KEYFOUND ==============')
+                print('BSGS FOUND PrivateKey ',hex(kk))
+                print('======================================')
+                exit()
+            else:
+                S = S - wG
+                stp = stp + w
                 
         else:
             # Giant step
