@@ -99,6 +99,26 @@ PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xd933f4b
 PVK not found. 5.00000 Trillion scanned in 0.30 sec. New range [+] k1: 0xf77f7278069cd96b09e0ec82a10557
 PVK not found. 5.00000 Trillion scanned in 0.29 sec. New range [+] k1: 0xed1423b6a6c9d7f7b3bfe18c32f1a9
 
+
+
+(base) C:\anaconda3>python bsgs_hybrid_gmp.py -pfile Pub50.txt -b FULLbpfile.bin -bl Bigbloomfilter.bin -n 8000000000 -rand
+[+] Starting Program : BSGS mode with hybrid algo using bloom
+[+] Loading 34577 Public Keys to search
+[+] Reading bloom filter from file complete in : 1.98043 sec
+[+] Reading Baby table from file complete in : 0.00000 sec
+[+] seq value: 8000000000    m value : 400000000
+[+] Search Range: 0x1  to  0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0
+                                                               [+] k1: 0x7b6d1063194855450b1027d1e70e3a027d17c12294f8ca5621936db1a3da0dc6
+PVK not found. 8.00000 Billion scanned in 17.72 sec. New range [+] k1: 0x395277ea5ee6c7d81721af94e756abd496f1cf06c511dd3c24e9eb1bd3c02720
+PVK not found. 8.00000 Billion scanned in 17.76 sec. New range [+] k1: 0xa807af4cb93b49b9b410b3b9514fe13e55d389d86568dbbc32021d674fbd1e9
+PVK not found. 8.00000 Billion scanned in 22.56 sec. New range [+] k1: 0x72b53d73f191f44aa86bbe8e109e70f74d7c90a1b103db74e803c0155275853f
+PVK not found. 8.00000 Billion scanned in 21.45 sec. New range [+] k1: 0x47467eadacb90710d8627287c090c598c95fa6e50d278a74d4407ae9095a093a
+PVK not found. 8.00000 Billion scanned in 20.69 sec. New range [+] k1: 0x69ce4c10554cae4b11ce9efad3f846b86deaf9091df56e7964fff6d20839a0b7
+PVK not found. 8.00000 Billion scanned in 21.07 sec. New range [+] k1: 0x557cebfbd460b29b6d6d72e5ebf62b92029c5a23905e8fdc25e8dcac3beffa20
+PVK not found. 8.00000 Billion scanned in 20.93 sec. New range [+] k1: 0x6d679ec05c9cba280ce37d57621904ee3c40b13b9db572cae31bd30f93cec448
+PVK not found. 8.00000 Billion scanned in 21.48 sec. New range [+] k1: 0x96d8875dd156f5ca3479182d469d1a473570c0afa1d513647a23bf36685e281
+PVK not found. 8.00000 Billion scanned in 23.05 sec. New range [+] k1: 0x4ff7418bbfc0997120c35832a359dac4f4ceb67ccbcee063dffa158dcede3bf9
+PVK not found. 8.00000 Billion scanned in 20.45 sec. New range [+] k1: 0x757fe61f758d4120be78a0e9d93e8378cd2b80d010a6415a41e0791017ae898a
 ```
 **IceLand **
 ```
