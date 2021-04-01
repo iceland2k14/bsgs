@@ -63,11 +63,12 @@ def update_bloom(positions, bitarr):
 # Getting bit from position 2:      bitarray & 1<<2
 
 
-def read_FULL_baby_file():
+def read_FULL_baby_file(pos, num_bytes):
 #    a = array('B')
 #    elem = int((os.stat(bs_file).st_size)/32)
     with open(input_bPfile,'rb') as f:
-        a = bytearray(f.read())
+        f.seek(pos)
+        a = bytearray(f.read(num_bytes))
 #        a.fromfile(f, elem)
     return a
     
@@ -76,8 +77,8 @@ def bloom_save_to_file(bitarr):
         bitarr.tofile(fh)
 # =============================================================================
 print('[+] Reading Baby table from file ',total_entries,' elements')
-baby_bin = read_FULL_baby_file()
-
+#baby_bin = read_FULL_baby_file()
+f = open(input_bPfile,'rb')
 
 # ==============Compromize Speed with RAM : Use for normal case ==============
 seq = range(0, total_entries)
@@ -87,17 +88,18 @@ print('[+] Created {} Chunks ...'.format(len(parts_list)))
 k = 1
 print('[+] Inserting baby table elements in bloom filter: Updating bloom in chunks')
 
-for piece in parts_list:
+while True:
+    baby_bin = bytearray(f.read(chunk*32))
+    if not baby_bin: break
     print('[+] Working on Chunk {} ...'.format(k), end='\r')
-    start_value = min(piece)
-    end_value = max(piece)
     ll_list = []
-    for cnt in range(start_value, end_value+1):
+    for cnt in range(len(baby_bin)//32):
         one_line = baby_bin[cnt*32:cnt*32+32].hex()
         ll = hashit(one_line, bloom_hashes)
         ll_list.extend(ll)
     update_bloom(ll_list, bloom_filter)
     k += 1
+    
     
 
 # ==============Too frequent access is slow : Use if you have less RAM ========
