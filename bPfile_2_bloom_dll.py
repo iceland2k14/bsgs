@@ -58,7 +58,8 @@ print('bloom hashes:', bloom_hashes)
 # =============================================================================
 
 print('[+] Initializing the bloom filters to null')
-bloom_filter = bytes( bytearray(b'\x00') * (bloom_bits//8) )
+bloom_filter = bytes(b'\x00') * (bloom_bits//8)
+# bloom_filter = bytes( bytearray(b'\x00') * (bloom_bits//8) )
 # =============================================================================
 
 # =============================================================================
