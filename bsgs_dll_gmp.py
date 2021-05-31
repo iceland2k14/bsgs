@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Usage :
- > python bsgs_dll_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -bl Big_dll_bloom.bin -n 50000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
+ > python bsgs_dll_gmp.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b FULLbpfile.bin -bl Big5GB_dll_bloom.bin -n 50000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
+ > python bsgs_dll_gmp.py -p 02c6495c510ed187e6f7b4479fb62a12e653108fd8bc1443c1faefa80b5b3875d9 -b FULLbpfile.bin -bl Big5GB_dll_bloom.bin -n 500000000000000 -rand1
 
 @author: iceland
 @credits: Alberto, Keyhunt gmp library
@@ -17,16 +18,17 @@ import platform
 import argparse
 import gmp_ec as ec
 
-parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching 1 pubkey in the given range', 
+parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching 1 pubkey in the given range using 1 cpu', 
                                  epilog='Enjoy the program! :)    Tips BTC: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at \
                                  \nThanks a lot to AlbertoBSD Tips BTC: 1ABSD1rMTmNZHJrJP8AJhDNG1XbQjWcRz7')
-parser.version = '15042021'
+parser.version = '31052021'
 parser.add_argument("-p", "--pubkey", help = "Public Key in hex format (compressed or uncompressed)", required=True)
-parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile.py", required=True)
+parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile_mcpu.py", required=True)
 parser.add_argument("-bl", "--bloomfile", help = "Bloom filter file. created using bPfile_2_bloom_dll.py", required=True)
 parser.add_argument("-n", help = "Total sequential search in 1 loop. default=50000000000000", action='store')
 parser.add_argument("-keyspace", help = "Keyspace Range ( hex ) to search from min:max. default=1:order of curve", action='store')
-parser.add_argument("-rand", help = "Start from a random value in the given range from min:max", action="store_true")
+parser.add_argument("-rand", help = "Start from a random value in the given range from min:max and search n values then again take a new random", action="store_true")
+parser.add_argument("-rand1", help = "First Start from a random value, then go fully sequential, in the given range from min:max", action="store_true")
 
 if len(sys.argv)==1:
     parser.print_help()
@@ -37,9 +39,11 @@ args = parser.parse_args()
 seq = int(args.n) if args.n else 50000000000000
 ss = args.keyspace if args.keyspace else '1:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140'
 flag_random = True if args.rand else False
+flag_random1 = True if args.rand1 else False
 bs_file = args.bpfile       # 'FULLbpfile.bin'
 bloom_file = args.bloomfile # 'Big_dll_bloom.bin'
 public_key = args.pubkey    # '02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630'
+if flag_random1: flag_random = True
 ###############################################################################
 a, b = ss.split(':')
 a = int(a, 16)
@@ -62,10 +66,12 @@ m_bb = int((os.stat(bs_file).st_size)/32)      # each xpoint is 32 bytes in the 
 lastitem = 0
 
 if platform.system().lower().startswith('win'):
-    mylib = ctypes.CDLL('bloom.dll')
+    pathdll = os.path.realpath('bloom.dll')
+    mylib = ctypes.CDLL(pathdll)
     
 elif platform.system().lower().startswith('lin'):
-    mylib = ctypes.CDLL('./bloom.so')
+    pathdll = os.path.realpath('bloom.so')
+    mylib = ctypes.CDLL(pathdll)
     
 else:
     print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
@@ -124,7 +130,8 @@ def read_FULL_baby_file(num_bytes):
 
 def bloom_read_dll_from_file():
     with open(bloom_file,'rb') as f:
-        ba_bloom2 = bytes( bytearray(f.read()) )
+        ba_bloom2 = bytes(f.read())
+#        ba_bloom2 = bytes( bytearray(f.read()) )
     return ba_bloom2
 
 
@@ -133,7 +140,17 @@ def bloom_read_dll_from_file():
 st = time.time()
 print('[+] Starting Program : BSGS mode')
 Q = pub2point(public_key)
+print('[+] Searching Started for the Public key')
+print(Q)
 Sym_Q = sym_point(Q)
+
+
+if flag_random1 == True:
+    print('[+] Search Mode: Random Start then Fully sequential from it')
+elif flag_random == True:
+    print('[+] Search Mode: Random Start after every n sequential key search')
+else:
+    print('[+] Search Mode: Sequential search in the given range')
 
 
 bloom_filter = bloom_read_dll_from_file()
@@ -166,6 +183,8 @@ st = time.time()
 k1 = randk(a, b) # start from
 k2 = k1 + seq
 
+# Reset the flag after getting 1st Random Start Key
+if flag_random1 == True: flag_random = False
 
 print('[+] seq value:',seq,'   m value :' , m)
 G = ec.G
