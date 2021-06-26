@@ -3,7 +3,7 @@
 Create bpfile.bin using multi_cpu
 
 Usage :
- > python create_bPfile_mcpu2.py 400000000 mybPfile.bin 4
+ > python create_bPfile_mcpu2.py 400000000 bpfile.bin 4
 
 @author: iceland
 """
@@ -11,12 +11,24 @@ import sys
 import time
 import ctypes
 import os
+import platform
 from itertools import islice 
 import math
 from multiprocessing import Pool
 
 
-ice = ctypes.CDLL('ice_secp256k1.dll')
+if platform.system().lower().startswith('win'):
+    pathdll = os.path.realpath('ice_secp256k1.dll')
+    ice = ctypes.CDLL(pathdll)
+    
+elif platform.system().lower().startswith('lin'):
+    pathdll = os.path.realpath('ice_secp256k1.so')
+    ice = ctypes.CDLL(pathdll)
+    
+else:
+    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
+    sys.exit()
+    
 
 ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]            # pvk,ret
 ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
@@ -86,7 +98,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 4 or len(sys.argv) < 4:
         print('[+] Program Usage.... ')
         print('{} <bP items> <output filename> <Number of cpu>\n'.format(sys.argv[0]))
-        print('Example to create a File with 400 million items using 4 cpu:\n{} 400000000 bPfile.bin 4'.format(sys.argv[0]))
+        print('Example to create a File with 400 million items using 4 cpu:\n{} 400000000 bpfile.bin 4'.format(sys.argv[0]))
         sys.exit()
 
     st = time.time()
