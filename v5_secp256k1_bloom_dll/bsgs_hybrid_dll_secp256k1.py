@@ -112,6 +112,10 @@ ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]         
 ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
 ice.point_negation.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
 ice.point_doubling.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
+ice.hash_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p]  # 012,comp,hash
+ice.hash_to_address.restype = ctypes.c_char_p
+ice.pubkey_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p, ctypes.c_char_p]  # 012,comp,x,y
+ice.pubkey_to_address.restype = ctypes.c_char_p
 ice.create_baby_table.argtypes = [ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_char_p] # start,end,ret
 ice.point_addition.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
 ice.point_subtraction.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
@@ -140,6 +144,18 @@ def point_negation(pubkey_bytes):
     ice.point_negation(x1, y1, res)
     return res
 
+def hash_to_address(addr_type, iscompressed, hash160_bytes):
+    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
+    res = ice.pubkey_to_address(addr_type, iscompressed, hash160_bytes)
+    return res.decode('utf8')
+
+def pubkey_to_address(addr_type, iscompressed, pubkey_bytes):
+    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
+    x1 = pubkey_bytes[1:33]
+    y1 = pubkey_bytes[33:]
+    res = ice.pubkey_to_address(addr_type, iscompressed, x1, y1)
+    return res.decode('utf8')
+    
 def create_baby_table(start_value, end_value):
     res = (b'\x00') * ((1+end_value-start_value) * 32)
     ice.create_baby_table(start_value, end_value, res)
@@ -181,17 +197,20 @@ def point_loop_subtraction(num, pubkey1_bytes, pubkey2_bytes):
 
 ###############################################################################
 def randk(a, b):
-	if flag_random:
-		random.seed(random.randint(1,2**256))
-		return random.SystemRandom().randint(a, b)
-	else:
-		if lastitem == 0:
-			return a
-		elif lastitem > b:
-			print('[+] Range Finished')
-			exit()
-		else:
-			return lastitem + 1
+    if flag_random:
+        dd = list(str(random.randint(1,2**256)))
+        random.shuffle(dd); random.shuffle(dd)
+        rs = int(''.join(dd))
+        random.seed(rs)
+        return random.SystemRandom().randint(a, b)
+    else:
+        if lastitem == 0:
+            return a
+        elif lastitem > b:
+            print('[+] Range Finished')
+            exit()
+        else:
+            return lastitem + 1
 
 def scan_str(num):
 	# Kilo/Mega/Giga/Tera/Peta/Exa/Zetta/Yotta
