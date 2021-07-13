@@ -21,7 +21,7 @@ import argparse
 parser = argparse.ArgumentParser(description='This tool use bsgs algo for sequentially searching all pubkeys (together) in the given range', 
                                  epilog='Enjoy the program! :)    Tips BTC: bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at \
                                  \nThanks a lot to AlbertoBSD Tips BTC: 1ABSD1rMTmNZHJrJP8AJhDNG1XbQjWcRz7')
-parser.version = '26062021'
+parser.version = '13072021'
 parser.add_argument("-pfile", "--pfile", help = "Public Key in hex format (compressed or uncompressed) line by line", action="store")
 parser.add_argument("-xfile", "--xfile", help = "xpoint in hex format line by line. Both 02 & 03 will be considered automatically", action="store")
 parser.add_argument("-b", "--bpfile", help = "Baby Point file. created using create_bPfile_mcpu2.py", required=True)
@@ -109,17 +109,17 @@ else:
 
 
 ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]            # pvk,ret
-ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
+# ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
 ice.point_negation.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
-ice.point_doubling.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
-ice.hash_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p]  # 012,comp,hash
-ice.hash_to_address.restype = ctypes.c_char_p
-ice.pubkey_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p, ctypes.c_char_p]  # 012,comp,x,y
-ice.pubkey_to_address.restype = ctypes.c_char_p
-ice.create_baby_table.argtypes = [ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_char_p] # start,end,ret
-ice.point_addition.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
+# ice.point_doubling.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
+# ice.hash_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p]  # 012,comp,hash
+# ice.hash_to_address.restype = ctypes.c_char_p
+# ice.pubkey_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p, ctypes.c_char_p]  # 012,comp,x,y
+# ice.pubkey_to_address.restype = ctypes.c_char_p
+# ice.create_baby_table.argtypes = [ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_char_p] # start,end,ret
+# ice.point_addition.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
 ice.point_subtraction.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
-ice.point_loop_subtraction.argtypes = [ctypes.c_ulonglong, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # k,x1,y1,x2,y2,ret
+# ice.point_loop_subtraction.argtypes = [ctypes.c_ulonglong, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # k,x1,y1,x2,y2,ret
 
 ice.init_secp256_lib()
 
@@ -130,12 +130,14 @@ def scalar_multiplication(kk):
     ice.scalar_multiplication(pass_int_value, res)
     return res
 
-def point_increment(pubkey_bytes):
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_increment(x1, y1, res)
-    return res
+# =============================================================================
+# def point_increment(pubkey_bytes):
+#     x1 = pubkey_bytes[1:33]
+#     y1 = pubkey_bytes[33:]
+#     res = (b'\x00') * 65
+#     ice.point_increment(x1, y1, res)
+#     return res
+# =============================================================================
 
 def point_negation(pubkey_bytes):
     x1 = pubkey_bytes[1:33]
@@ -144,38 +146,42 @@ def point_negation(pubkey_bytes):
     ice.point_negation(x1, y1, res)
     return res
 
-def hash_to_address(addr_type, iscompressed, hash160_bytes):
-    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
-    res = ice.pubkey_to_address(addr_type, iscompressed, hash160_bytes)
-    return res.decode('utf8')
-
-def pubkey_to_address(addr_type, iscompressed, pubkey_bytes):
-    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = ice.pubkey_to_address(addr_type, iscompressed, x1, y1)
-    return res.decode('utf8')
+# =============================================================================
+# def hash_to_address(addr_type, iscompressed, hash160_bytes):
+#     # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
+#     res = ice.pubkey_to_address(addr_type, iscompressed, hash160_bytes)
+#     return res.decode('utf8')
+# 
+# def pubkey_to_address(addr_type, iscompressed, pubkey_bytes):
+#     # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
+#     x1 = pubkey_bytes[1:33]
+#     y1 = pubkey_bytes[33:]
+#     res = ice.pubkey_to_address(addr_type, iscompressed, x1, y1)
+#     return res.decode('utf8')
+# =============================================================================
     
-def create_baby_table(start_value, end_value):
-    res = (b'\x00') * ((1+end_value-start_value) * 32)
-    ice.create_baby_table(start_value, end_value, res)
-    return res
-
-def point_doubling(pubkey_bytes):
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_doubling(x1, y1, res)
-    return res
-
-def point_addition(pubkey1_bytes, pubkey2_bytes):
-    x1 = pubkey1_bytes[1:33]
-    y1 = pubkey1_bytes[33:]
-    x2 = pubkey2_bytes[1:33]
-    y2 = pubkey2_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_addition(x1, y1, x2, y2, res)
-    return res
+# =============================================================================
+# def create_baby_table(start_value, end_value):
+#     res = (b'\x00') * ((1+end_value-start_value) * 32)
+#     ice.create_baby_table(start_value, end_value, res)
+#     return res
+# 
+# def point_doubling(pubkey_bytes):
+#     x1 = pubkey_bytes[1:33]
+#     y1 = pubkey_bytes[33:]
+#     res = (b'\x00') * 65
+#     ice.point_doubling(x1, y1, res)
+#     return res
+# 
+# def point_addition(pubkey1_bytes, pubkey2_bytes):
+#     x1 = pubkey1_bytes[1:33]
+#     y1 = pubkey1_bytes[33:]
+#     x2 = pubkey2_bytes[1:33]
+#     y2 = pubkey2_bytes[33:]
+#     res = (b'\x00') * 65
+#     ice.point_addition(x1, y1, x2, y2, res)
+#     return res
+# =============================================================================
 
 def point_subtraction(pubkey1_bytes, pubkey2_bytes):
     x1 = pubkey1_bytes[1:33]
@@ -186,14 +192,16 @@ def point_subtraction(pubkey1_bytes, pubkey2_bytes):
     ice.point_subtraction(x1, y1, x2, y2, res)
     return res
 
-def point_loop_subtraction(num, pubkey1_bytes, pubkey2_bytes):
-    x1 = pubkey1_bytes[1:33]
-    y1 = pubkey1_bytes[33:]
-    x2 = pubkey2_bytes[1:33]
-    y2 = pubkey2_bytes[33:]
-    res = (b'\x00') * (65 * num)
-    ice.point_loop_subtraction(num, x1, y1, x2, y2, res)
-    return res
+# =============================================================================
+# def point_loop_subtraction(num, pubkey1_bytes, pubkey2_bytes):
+#     x1 = pubkey1_bytes[1:33]
+#     y1 = pubkey1_bytes[33:]
+#     x2 = pubkey2_bytes[1:33]
+#     y2 = pubkey2_bytes[33:]
+#     res = (b'\x00') * (65 * num)
+#     ice.point_loop_subtraction(num, x1, y1, x2, y2, res)
+#     return res
+# =============================================================================
 
 ###############################################################################
 def randk(a, b):
@@ -232,31 +240,33 @@ def scan_str(num):
 # 		y = int(pub_hex[66:], 16)
 # 	return ec.Point(x, y)
 # =============================================================================
-def getX2Y(X, y_parity, p=115792089237316195423570985008687907853269984665640564039457584007908834671663):
-    Y = 3
-    tmp = 1
-    while Y:
-        if Y & 1:
-            tmp = tmp * X % p
-        Y >>= 1
-        X = X * X % p
-
-    X = (tmp + 7) % p
-
-    Y = (p + 1) // 4
-    tmp = 1
-    while Y:
-        if Y & 1:
-            tmp = tmp * X % p
-        Y >>= 1
-        X = X * X % p
-
-    Y = tmp
-
-    if Y % 2 != y_parity:
-        Y = -Y % p
-
-    return Y
+# =============================================================================
+# def getX2Y(X, y_parity, p=115792089237316195423570985008687907853269984665640564039457584007908834671663):
+#     Y = 3
+#     tmp = 1
+#     while Y:
+#         if Y & 1:
+#             tmp = tmp * X % p
+#         Y >>= 1
+#         X = X * X % p
+# 
+#     X = (tmp + 7) % p
+# 
+#     Y = (p + 1) // 4
+#     tmp = 1
+#     while Y:
+#         if Y & 1:
+#             tmp = tmp * X % p
+#         Y >>= 1
+#         X = X * X % p
+# 
+#     Y = tmp
+# 
+#     if Y % 2 != y_parity:
+#         Y = -Y % p
+# 
+#     return Y
+# =============================================================================
 
 def pub2upub(pub_hex):
 	x = int(pub_hex[2:66],16)
@@ -335,6 +345,7 @@ if w > m_bb:
 baby_bin = read_FULL_baby_file(w*32)
 print('[+] Reading Baby table from file complete in : {0:.5f} sec'.format(time.time() - st))
 st = time.time()
+baby_dict = {sys.intern(baby_bin[i*32:i*32+32].hex()):i for i in range(w)}
 # baby_steps = [baby_bin[cnt*32:cnt*32+32].hex() for cnt in range(w)]
 # baby_steps = {int(line,10):k for k, line in enumerate(baby_steps)}
 # baby_steps = set(baby_steps)
@@ -369,7 +380,9 @@ st = time.time()
 def bsgs_exact_key(pubkey_point, z1, z2):
     z1G = bytes(bytearray(scalar_multiplication(z1)))
     if z1G == pubkey_point:
+        print('============== KEYFOUND ==============')
         print('BSGS FOUND PrivateKey ', hex(z1))
+        print('======================================')
         return True
     S = bytes(bytearray(point_subtraction(pubkey_point, z1G)))
     
@@ -383,9 +396,11 @@ def bsgs_exact_key(pubkey_point, z1, z2):
         hex_line = bytes(bytearray(S[1:33]))
 #        hex_line = hex(S.x)[2:].zfill(64)
 #        idx = baby_bin.find(bytes.fromhex(hex_line), 0)
-        idx = baby_bin.find(hex_line, 0)
-        if idx > 0:
-            kk = z1+stp+int(idx/32)+1
+#        idx = baby_bin.find(hex_line, 0)
+        idx = baby_dict.get(hex_line.hex())
+        if idx is not None and idx >= 0:
+#            kk = z1+stp+int(idx/32)+1
+            kk = z1+stp+idx+1
             print('[*] Bloom collision and bPfile collision... Final check for the key', hex(kk))
             if bytes(bytearray(scalar_multiplication(kk))) == pubkey_point:
                 print('============== KEYFOUND ==============')
@@ -412,9 +427,20 @@ def bsgs_exact_key(pubkey_point, z1, z2):
 def bsgs_keys(pubkey_point, k1, k2):
     found = False
     if pubkey_point == k1G:
+        print('============== KEYFOUND ==============')
         print('BSGS FOUND PrivateKey ', hex(k1))
+        print('======================================')
         found = True
         return found
+    
+    if k1 < w:
+        idx = baby_dict.get(pubkey_point[1:33].hex())
+        if idx is not None and idx >= 0:
+            print('============== KEYFOUND ==============')
+            print('BSGS FOUND PrivateKey ', hex(idx))
+            print('======================================')
+            found = True
+            return found
     
     S = bytes(bytearray(point_subtraction(pubkey_point, k1G)))
 #    hex_line = bytes(bytearray(S[1:33]))
