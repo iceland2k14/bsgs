@@ -59,8 +59,16 @@ if platform.system().lower().startswith('win'):
         icebsgs = ctypes.CDLL(pathdll)
     else:
         print('File {} not found'.format(dllfile))
+
+elif platform.system().lower().startswith('lin'):
+    dllfile = 'BSGS.so'
+    if os.path.isfile(dllfile) == True:
+        pathdll = os.path.realpath(dllfile)
+        icebsgs = ctypes.CDLL(pathdll)
+    else:
+        print('File {} not found'.format(dllfile))
 else:
-    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows] is working')
+    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
     sys.exit()
 
 icebsgs.init_bsgs_bloom.argtypes = [ctypes.c_int, ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_int, ctypes.c_char_p] #cpu,total,_bits,_hashes,_bf
