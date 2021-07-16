@@ -391,7 +391,7 @@ def bsgs_exact_key(pubkey_point, z1, z2):
 #    curr_byte_pos = 0
     
     stp = 0
-    print('[*] Bloom collision... Checking inside the bPfile Now... ')
+#    print('[*] Bloom collision... Checking inside the bPfile Now... ')
     while stp<(1+z2-z1):
         hex_line = bytes(bytearray(S[1:33]))
 #        hex_line = hex(S.x)[2:].zfill(64)
@@ -401,7 +401,7 @@ def bsgs_exact_key(pubkey_point, z1, z2):
         if idx is not None and idx >= 0:
 #            kk = z1+stp+int(idx/32)+1
             kk = z1+stp+idx+1
-            print('[*] Bloom collision and bPfile collision... Final check for the key', hex(kk))
+#            print('[*] Bloom collision and bPfile collision... Final check for the key', hex(kk))
             if bytes(bytearray(scalar_multiplication(kk))) == pubkey_point:
                 print('============== KEYFOUND ==============')
                 print('BSGS FOUND PrivateKey ',hex(kk))
@@ -437,7 +437,7 @@ def bsgs_keys(pubkey_point, k1, k2):
         idx = baby_dict.get(pubkey_point[1:33].hex())
         if idx is not None and idx >= 0:
             print('============== KEYFOUND ==============')
-            print('BSGS FOUND PrivateKey ', hex(idx))
+            print('BSGS FOUND PrivateKey ', hex(idx+1))
             print('======================================')
             found = True
             return found
