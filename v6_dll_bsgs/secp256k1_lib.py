@@ -11,7 +11,6 @@ import ctypes
 
 
 ###############################################################################
-# N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
 #==============================================================================
 if platform.system().lower().startswith('win'):
     dllfile = 'ice_secp256k1.dll'
@@ -38,10 +37,6 @@ else:
 
 ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]            # pvk,ret
 #==============================================================================
-ice.point_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]   # upub,scalar,ret
-#==============================================================================
-ice.get_x_to_y.argtypes = [ctypes.c_char_p, ctypes.c_bool, ctypes.c_char_p]   # x,even,ret
-#==============================================================================
 ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
 #==============================================================================
 ice.point_negation.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
@@ -67,8 +62,6 @@ ice.privatekey_loop_h160.argtypes = [ctypes.c_ulonglong, ctypes.c_int, ctypes.c_
 ice.pubkey_to_h160.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p, ctypes.c_char_p]  # 012,comp,upub,ret
 #==============================================================================
 ice.pbkdf2_hmac_sha512_dll.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int] # ret, words, len
-#==============================================================================
-ice.get_sha256.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p] # input, len, ret
 #==============================================================================
 ice.create_baby_table.argtypes = [ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_char_p] # start,end,ret
 #==============================================================================
@@ -109,25 +102,6 @@ def _scalar_multiplication(kk):
     return res
 def scalar_multiplication(kk):
     res = _scalar_multiplication(kk)
-    return bytes(bytearray(res))
-#==============================================================================
-def _point_multiplication(pubkey_bytes, kk):
-    ''' Input Point and Integer value passed to function. 65 bytes uncompressed pubkey output '''
-    res = (b'\x00') * 65
-    pass_int_value = hex(kk)[2:].encode('utf8')
-    ice.point_multiplication(pubkey_bytes, pass_int_value, res)
-    return res
-def point_multiplication(pubkey_bytes, kk):
-    res = _point_multiplication(pubkey_bytes, kk)
-    return bytes(bytearray(res))
-#==============================================================================
-def _get_x_to_y(x_hex, is_even):
-    ''' Input x_hex encoded as bytes and bool is_even. 32 bytes y of point output '''
-    res = (b'\x00') * 32
-    ice.get_x_to_y(x_hex.encode('utf8'), is_even, res)
-    return res
-def get_x_to_y(x_hex, is_even):
-    res = _get_x_to_y(x_hex, is_even)
     return bytes(bytearray(res))
 #==============================================================================
 def _point_increment(pubkey_bytes):
@@ -225,17 +199,10 @@ def pbkdf2_hmac_sha512_dll(words):
     ice.pbkdf2_hmac_sha512_dll(seed_bytes, words.encode("utf-8"), len(words))
     return seed_bytes
 #==============================================================================
-def get_sha256(input_bytes):
-    digest_bytes = (b'\x00') * 32
-    if type(input_bytes) == str: input_bytes = input_bytes.encode("utf-8")
-#    MiniKey example
-    ice.get_sha256(input_bytes, len(input_bytes), digest_bytes)
-    return digest_bytes
-#==============================================================================
 def create_baby_table(start_value, end_value):
     res = (b'\x00') * ((1+end_value-start_value) * 32)
     ice.create_baby_table(start_value, end_value, res)
-    return bytes(bytearray(res))
+    return res
 #==============================================================================
 def _point_addition(pubkey1_bytes, pubkey2_bytes):
     x1 = pubkey1_bytes[1:33]
