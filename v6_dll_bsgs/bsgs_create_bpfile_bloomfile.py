@@ -13,44 +13,9 @@ import ctypes
 import os
 import platform
 import math
+import secp256k1_lib as ice
 
 ###############################################################################
-if platform.system().lower().startswith('win'):
-    dllfile = 'ice_secp256k1.dll'
-    if os.path.isfile(dllfile) == True:
-        pathdll = os.path.realpath(dllfile)
-        ice = ctypes.CDLL(pathdll)
-    else:
-        print('File {} not found'.format(dllfile))
-    
-elif platform.system().lower().startswith('lin'):
-    dllfile = 'ice_secp256k1.so'
-    if os.path.isfile(dllfile) == True:
-        pathdll = os.path.realpath(dllfile)
-        ice = ctypes.CDLL(pathdll)
-    else:
-        print('File {} not found'.format(dllfile))
-    
-else:
-    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
-    sys.exit()
-    
-###############################################################################
-ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]            # pvk,ret
-ice.point_increment.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x,y,ret
-ice.point_negation.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
-ice.point_doubling.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]  # x,y,ret
-ice.hash_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p]  # 012,comp,hash
-ice.hash_to_address.restype = ctypes.c_char_p
-ice.pubkey_to_address.argtypes = [ctypes.c_int, ctypes.c_bool, ctypes.c_char_p, ctypes.c_char_p]  # 012,comp,x,y
-ice.pubkey_to_address.restype = ctypes.c_char_p
-ice.create_baby_table.argtypes = [ctypes.c_ulonglong, ctypes.c_ulonglong, ctypes.c_char_p] # start,end,ret
-ice.point_addition.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
-ice.point_subtraction.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # x1,y1,x2,y2,ret
-ice.point_loop_subtraction.argtypes = [ctypes.c_ulonglong, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p] # k,x1,y1,x2,y2,ret
-
-ice.init_secp256_lib()
-
 ###############################################################################
 if platform.system().lower().startswith('win'):
     dllfile = 'BSGS.dll'
@@ -75,81 +40,8 @@ icebsgs.init_bsgs_bloom.argtypes = [ctypes.c_int, ctypes.c_ulonglong, ctypes.c_u
 
 ###############################################################################
 
-def scalar_multiplication(kk):
-    res = (b'\x00') * 65
-    pass_int_value = hex(kk)[2:].encode('utf8')
-    ice.scalar_multiplication(pass_int_value, res)
-    return res
-
-def point_increment(pubkey_bytes):
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_increment(x1, y1, res)
-    return res
-
-def point_negation(pubkey_bytes):
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_negation(x1, y1, res)
-    return res
-
-def hash_to_address(addr_type, iscompressed, hash160_bytes):
-    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
-    res = ice.pubkey_to_address(addr_type, iscompressed, hash160_bytes)
-    return res.decode('utf8')
-
-def pubkey_to_address(addr_type, iscompressed, pubkey_bytes):
-    # type = 0 [p2pkh],  1 [p2sh],  2 [bech32]
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = ice.pubkey_to_address(addr_type, iscompressed, x1, y1)
-    return res.decode('utf8')
-    
-def create_baby_table(start_value, end_value):
-    res = (b'\x00') * ((1+end_value-start_value) * 32)
-    ice.create_baby_table(start_value, end_value, res)
-    return res
-
-def point_doubling(pubkey_bytes):
-    x1 = pubkey_bytes[1:33]
-    y1 = pubkey_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_doubling(x1, y1, res)
-    return res
-
-def point_addition(pubkey1_bytes, pubkey2_bytes):
-    x1 = pubkey1_bytes[1:33]
-    y1 = pubkey1_bytes[33:]
-    x2 = pubkey2_bytes[1:33]
-    y2 = pubkey2_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_addition(x1, y1, x2, y2, res)
-    return res
-
-def point_subtraction(pubkey1_bytes, pubkey2_bytes):
-    x1 = pubkey1_bytes[1:33]
-    y1 = pubkey1_bytes[33:]
-    x2 = pubkey2_bytes[1:33]
-    y2 = pubkey2_bytes[33:]
-    res = (b'\x00') * 65
-    ice.point_subtraction(x1, y1, x2, y2, res)
-    return res
-
-def point_loop_subtraction(num, pubkey1_bytes, pubkey2_bytes):
-    x1 = pubkey1_bytes[1:33]
-    y1 = pubkey1_bytes[33:]
-    x2 = pubkey2_bytes[1:33]
-    y2 = pubkey2_bytes[33:]
-    res = (b'\x00') * (65 * num)
-    ice.point_loop_subtraction(num, x1, y1, x2, y2, res)
-    return res
-
-###############################################################################
-
 def create_table(start_value, end_value):
-    baby_steps = create_baby_table(start_value, end_value)
+    baby_steps = ice.create_baby_table(start_value, end_value)
     return baby_steps
   
 # =============================================================================
@@ -197,7 +89,7 @@ if __name__ == '__main__':
     
 ###############################################################################
     
-
+    print('='*75)
     print('[+] Starting bloom file creation ... with False Positive probability :', bloom_prob)
     print('[+] bloom bits  :', bloom_bits, '   size [%s MB]'%(bloom_bits//(8*1024*1024)))
     print('[+] bloom hashes:', bloom_hashes)
