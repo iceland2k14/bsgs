@@ -1,56 +1,49 @@
 # bsgs
 Find PrivateKey of corresponding Pubkey(s) using BSGS algo.
-Python3 implementation Using 1 thread. 
+Python3 implementation. 
 
-## v1_fastecdsa & v2_gmp & v3_gmp_bloom & v4_dll_gmp_bloom
+### v1_fastecdsa & v2_gmp & v3_gmp_bloom & v4_dll_gmp_bloom & v5_secp256k1_bloom_dll
 README files moved to their corresponding folders
 
-## LATEST Version : v5_dll_secp256k1_bloom
-This script uses compiled library bloom_batch.dll / bloom_batch.so for Windows/Linux to handle the bloom part. The EC math part has been selected from secp256k1 compiled library. The efficiency is increased in creating the bpfile, bloomfilter file and overall Performance increase in Key Search.
-
-The main script to search 1 public key using BSGS algo is bsgs_dll_secp256k1.py
-
-Another script _bsgs_hybrid_dll_secp256k1.py_ has been include to search multiple publickeys all Together (not 1 by 1). Here the script can search millions of pubkey at once but the speed reduces quickly. Although it is still faster than searching the address or HASH160.
+## LATEST Version : v6_dll_bsgs
+This script uses compiled library BSGS.dll / BSGS.so for Windows/Linux to handle the bloom part. The EC math part has been selected from secp256k1 compiled library. The efficiency is increased in creating the bpfile, bloomfilter file and overall Performance increase in Key Search.
 
 ## Usage
-- ```python create_bPfile_mcpu2.py 200000000 bPfile.bin 4```  _This uses 4 cpu to make bPfile with 200 million items._
-- ```python bPfile_2_bloom_dll_batch.py bpfile.bin bloomfile.bin```    _This converts that bPfile created earlier into a bloom file._
+- ```python bsgs_create_bpfile_bloomfile.py 3000000000 bpfile.bin bloomfile.bin 4```  _This uses 4 cpu to make bPfile and bloomfile with 3 billion items._
 - ```python bsgs_dll_secp256k1.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b bPfile.bin -bl bloomfile.bin -n 50000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand```   _This is the main script to search for 1 pubkey using the files created earlier._
 - ```python bsgs_hybrid_dll_secp256k1.py -pfile Pub50.txt -b FULLbpfile.bin -bl Big5GB_dll_bloom.bin -n 8000000000 -rand1```   _This is the main script to search for multi pubkey using the files created earlier._
 
 ***Note: Think about How much RAM your system has free which you are going to allow to use in this script.
 For Example 1 billion items will require 5GB bloom file and therefore 5GB for running the final script. So plan accordingly during creation of bPfile and bloomfile.***
-|    RAM     | bpfile elements | bpfile size | bloom size  |
-| ---------- | --------------- | ----------- | ----------- |
-|   8 GB     | 1000000000      |   32 GB     |   5.02  GB  |
-|  32 GB     | 5000000000      |   160 GB    |   25.11 GB  |
-|  128 GB    | 22000000000     |   704 GB    |   110.47 GB |
-|  500 GB    | 90000000000     |   2.9 TB    |   451.92 GB |
+|    RAM     | total elements  | bloom size  |
+| ---------- | --------------- | ----------- |
+|   8 GB     | 1000000000      |   5.02  GB  |
+|  32 GB     | 5000000000      |   25.11 GB  |
+|  128 GB    | 22000000000     |   110.47 GB |
+|  500 GB    | 90000000000     |   451.92 GB |
 
 # Run
 ```
-(base) C:\anaconda3>python create_bPfile_mcpu2.py 37000000 yybPfile.bin 4
+(base) C:\anaconda3>python bsgs_create_bpfile_bloomfile.py 3000000000 bpfile.bin bloomfile.bin 4
+
 [+] Program Running please wait...
-[+] Each chunk size : 10000000
-[+] Created Total 4 Chunks ...
-[+] Working on Chunk 1 ...
-[+] Working on Chunk 2 ...
-[+] Working on Chunk 3 ...
-[+] Working on Chunk 4 ...
-[+] File created successfully
-[-] Completed in 37.92 sec
+[+] Number of items required for Final Script : [bp : 54773] [bloom : 3000000000]
+[+] Output Size of the files : [bp : 1752736 Bytes] [bloom : 16174786012 Bytes]
+[+] Creating bpfile in range 1 to 54773
+[+] File : bpfile.bin created successfully in 0.13 sec
 
-
-(base) C:\anaconda3>python bPfile_2_bloom_dll_batch.py yybpfile.bin yy_bloom.bin
-bloom bits  : 1595912224    size [190 MB]
-bloom hashes: 30
+[+] Starting bloom file creation ... with False Positive probability : 1e-09
+[+] bloom bits  : 129398288096    size [15425 MB]
+[+] bloom hashes: 30
 [+] Initializing the bloom filters to null
-[+] Reading Baby table from file  37000000  elements
-[+] Created 37 Chunks ...
-[+] Inserting baby table elements in bloom filter: Updating bloom in chunks
-[+] Freeing some memory
-[+] Saving bloom filter to file
-[-] Completed in 87.70 sec
+[+] Number of CPU thread: 4
+[+] Thread  0: 0x0000000000000001 -> 0x000000002CB41780
+[+] Thread  1: 0x000000002CB41781 -> 0x0000000059682F00
+[+] Thread  2: 0x0000000059682F01 -> 0x00000000861C4680
+[+] Thread  3: 0x00000000861C4681 -> 0x00000000B2D05E00
+[+] Saving bloom filter to File
+[+] File : bloomfile.bin created successfully in 7908.88 sec
+[+] Program Finished
 
 
 (base) C:\anaconda3>python bsgs_dll_secp256k1.py -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -b 2B_bPfile.bin -bl 2B_bloom.bin -n 500000000000000 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -rand
@@ -89,35 +82,6 @@ PVK not found. 500.00000 Trillion scanned in 1.03 sec. New range [+] k1: 0xa5b03
 PVK not found. 500.00000 Trillion scanned in 1.03 sec. New range [+] k1: 0xba2708befe847c9ca40af41eb36328
 PVK not found. 500.00000 Trillion scanned in 1.02 sec. New range [+] k1: 0xabc6e64473de5ffb5a62f32c98b7ad
 
-
-(base) C:\anaconda3>python bsgs_hybrid_dll_secp256k1.py -pfile Pub50.txt -b FULLbpfile.bin -bl 2B_bloom.bin -n 8000000000 -rand1
-[+] Starting Program : BSGS mode with hybrid algo using bloom dll and secp256k1 dll     Version [ 26062021 ]
-[+] Loading 34577 Public Keys to search
-[+] Search Mode: Random Start then Fully sequential from it
-[+] Reading bloom filter from file complete in : 4.81413 sec
-[+] Reading Baby table from file complete in : 0.09243 sec
-[+] seq value: 8000000000    m value : 2000000000
-[+] Search Range: 0x1  to  0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140
-                                                              [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801579b3635208
-PVK not found. 8.00000 Billion scanned in 1.35 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680157b9039a209
-PVK not found. 8.00000 Billion scanned in 1.31 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680157d6d0ff20a
-PVK not found. 8.00000 Billion scanned in 1.40 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680157f49e6420b
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680158126bc920c
-PVK not found. 8.00000 Billion scanned in 1.30 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e868015830392e20d
-PVK not found. 8.00000 Billion scanned in 1.34 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801584e069320e
-PVK not found. 8.00000 Billion scanned in 1.31 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801586bd3f820f
-PVK not found. 8.00000 Billion scanned in 1.31 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e868015889a15d210
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680158a76ec2211
-PVK not found. 8.00000 Billion scanned in 1.33 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680158c53c27212
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680158e3098c213
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e868015900d6f1214
-PVK not found. 8.00000 Billion scanned in 1.36 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801591ea456215
-PVK not found. 8.00000 Billion scanned in 1.31 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801593c71bb216
-PVK not found. 8.00000 Billion scanned in 1.31 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e86801595a3f20217
-PVK not found. 8.00000 Billion scanned in 1.33 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680159780c85218
-PVK not found. 8.00000 Billion scanned in 1.30 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e868015995d9ea219
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680159b3a74f21a
-PVK not found. 8.00000 Billion scanned in 1.32 sec. New range [+] k1: 0x4a6808e02a457927edf2ec8c05afb5e4b112dee0e3be496e8680159d174b421b
 ```
 **IceLand**
 ```
