@@ -12,6 +12,7 @@ import bit
 import ctypes
 import os
 import sys
+import platform
 import random
 import math
 import signal
@@ -107,8 +108,26 @@ P = pub2upub(public_key)
 G = ice.scalar_multiplication(1)
 P3 = ice.point_loop_addition(bp_size, P, G)
 #==============================================================================
-
-bsgsgpu = ctypes.CDLL(os.path.realpath('bt2.dll'))
+if platform.system().lower().startswith('win'):
+    dllfile = 'bt2.dll'
+    if os.path.isfile(dllfile) == True:
+        pathdll = os.path.realpath(dllfile)
+        bsgsgpu = ctypes.CDLL(pathdll)
+    else:
+        print('File {} not found'.format(dllfile))
+    
+elif platform.system().lower().startswith('lin'):
+    dllfile = 'bt2.so'
+    if os.path.isfile(dllfile) == True:
+        pathdll = os.path.realpath(dllfile)
+        bsgsgpu = ctypes.CDLL(pathdll)
+    else:
+        print('File {} not found'.format(dllfile))
+        
+else:
+    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
+    sys.exit()
+    
 bsgsgpu.bsgsGPU.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_char_p] # t,b,p,rb,dv,upubs,size,keyspace,bp
 bsgsgpu.bsgsGPU.restype = ctypes.c_void_p
 bsgsgpu.free_memory.argtypes = [ctypes.c_void_p] # pointer
@@ -127,7 +146,7 @@ while True:
         print('Magic:  ', pvk)
         foundpub = bit.Key.from_int(int(pvk, 16)).public_key
         idx = P3.find(foundpub[1:33], 0)
-        #==============================================================================
+#==============================================================================
         if idx >=0:
             BSGS_Key = int(pvk, 16) - (((idx-1)//65)+1)
             print('============== KEYFOUND ==============')
