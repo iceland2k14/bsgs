@@ -83,6 +83,19 @@ PVK not found. 500.00000 Trillion scanned in 1.03 sec. New range [+] k1: 0xba270
 PVK not found. 500.00000 Trillion scanned in 1.02 sec. New range [+] k1: 0xabc6e64473de5ffb5a62f32c98b7ad
 
 ```
+# GPU Run
+```
+(base) C:\anaconda3\v7_gpu_trial>python bsgs_GPU.py -pubkey 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -n 1000000000000000000 -d 0 -t 256 -b 20 -p 512 -bp 30000000 -keyspace 800000000000000000000000000000:ffffffffffffffffffffffffffffff -rand
+
+[+] Starting Program.... Please Wait !
+[+] Search Mode: Random Start after every n sequential key search
+[2021-11-15.20:45:50] [Info] Starting at : 80810F961749F8823F4871B47E7DEB (120 bit)
+[2021-11-15.20:45:50] [Info] Ending at   : 80810F961749F8901FFF255BE27DEB (120 bit)
+[2021-11-15.20:45:50] [Info] Initializing Quadro K2100M
+[2021-11-15.20:52:04] [Info] Allocating bloom filter (1024.0MB)
+[DEV: Quadro K2100M    1785/2048MB] [K: 80810F961749F883C214195EBE7DEB (120 bit), C: 10.887326 %] [I: E980A4 (24 bit), 1] [T: 30000000] [S: 613.62 TK/s] [213,437,644,800,000,000 (33 bit)] [00:05:26]
+```
+
 **IceLand**
 ```
 BTC:	bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at
