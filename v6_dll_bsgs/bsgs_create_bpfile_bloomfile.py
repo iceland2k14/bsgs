@@ -13,7 +13,7 @@ import ctypes
 import os
 import platform
 import math
-import secp256k1_lib as ice
+import secp256k1 as ice
 
 ###############################################################################
 ###############################################################################
