@@ -177,6 +177,12 @@ ice.init_P2_Group.argtypes = [ctypes.c_char_p] # upub
 #==============================================================================
 ice.free_memory.argtypes = [ctypes.c_void_p] # pointer
 #==============================================================================
+ice.bloom_check_add.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_ulonglong, ctypes.c_ubyte, ctypes.c_char_p] #buff, len, 0_1, _bits, _hashes, _bf
+ice.bloom_check_add.restype = ctypes.c_int
+#==============================================================================
+ice.bloom_batch_add.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_ulonglong, ctypes.c_ubyte, ctypes.c_char_p] #chunk, buff, len, 0_1, _bits, _hashes, _bf
+#==============================================================================
+ice.test_bit_set_bit.argtypes = [ctypes.c_char_p, ctypes.c_ulonglong, ctypes.c_int] #_bf, _bits, 0_1
 
 ice.init_secp256_lib()
 #==============================================================================
