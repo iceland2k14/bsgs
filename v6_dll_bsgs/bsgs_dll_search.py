@@ -2,7 +2,7 @@
 """
 Usage :
  > python bsgs_dll_search.py -pfile 1to63_65.txt -b bpfile.bin -bl bloomfile.bin
- > python bsgs_dll_search.py -pfile Pub50.txt -b bpfile.bin -bl bloomfile.bin -rand1
+ > python bsgs_dll_search.py -pfile Pub50.txt -b bpfile.bin -bl bloomfile.bin -rand
  > python bsgs_dll_search.py -b bpfile.bin -bl bloomfile.bin -rand1 -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -n 500000000000000
 
 @author: iceland
@@ -12,10 +12,8 @@ import time
 import random
 import bit
 import os
-import ctypes
 import math
 import sys
-import platform
 import argparse
 import secp256k1 as ice
 
@@ -83,33 +81,6 @@ lastitem = 0
 
 ###############################################################################
 
-# =============================================================================
-if platform.system().lower().startswith('win'):
-    dllfile = 'bloom_batch.dll'
-    if os.path.isfile(dllfile) == True:
-        pathdll = os.path.realpath(dllfile)
-        mylib = ctypes.CDLL(pathdll)
-    else:
-        print('File {} not found'.format(dllfile))
-    
-elif platform.system().lower().startswith('lin'):
-    dllfile = 'bloom_batch.so'
-    if os.path.isfile(dllfile) == True:
-        pathdll = os.path.realpath(dllfile)
-        mylib = ctypes.CDLL(pathdll)
-    else:
-        print('File {} not found'.format(dllfile))
-        
-else:
-    print('[-] Unsupported Platform currently for ctypes dll method. Only [Windows and Linux] is working')
-    sys.exit()
-
-
-bloom_check_add = mylib.bloom_check_add
-bloom_check_add.restype = ctypes.c_int
-bloom_check_add.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_ulonglong, ctypes.c_ubyte, ctypes.c_char_p]
-
-###############################################################################
 # Very Very Slow. Made only to get a random number completely non pseudo stl.
 def randk(a, b):
     if flag_random:
@@ -327,6 +298,7 @@ def bsgs_keys(pubkey_point, k1, k2):
             return found
     
     S = ice.point_subtraction(pubkey_point, k1G)
+
     S_list = ice.point_sequential_increment_P2(1+(k2-k1)//m, S)
 #    S_list = ice.point_loop_subtraction(1+(k2-k1)//m, S, mG)
     curr_byte_pos = 0
@@ -337,7 +309,7 @@ def bsgs_keys(pubkey_point, k1, k2):
     step = 0
 	
     while found is False and step<(1+k2-k1):
-        if bloom_check_add(hex_line, 32, 0, bloom_bits, bloom_hashes, bloom_filter) > 0:
+        if ice.ice.bloom_check_add(hex_line, 32, 0, bloom_bits, bloom_hashes, bloom_filter) > 0:
             rt = bsgs_exact_key(pubkey_point, k1+step, k1+step+m)
             if rt == True:
                 return True
@@ -351,6 +323,7 @@ def bsgs_keys(pubkey_point, k1, k2):
         
         hex_line = S_list[curr_byte_pos+1:curr_byte_pos+33]
         curr_byte_pos += 65
+        
             
     return found
 
