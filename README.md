@@ -12,6 +12,7 @@ This script uses compiled library BSGS.dll / BSGS.so for Windows/Linux to handle
 - ```python bsgs_create_bpfile_bloomfile.py 3000000000 bpfile.bin bloomfile.bin 4```  _This uses 4 cpu to make bPfile and bloomfile with 3 billion items._
 - ```python bsgs_dll_search.py -keyspace 800000000000000000000000000000:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -b bpfile.bin -bl bloomfile.bin -p 02CEB6CBBCDBDF5EF7150682150F4CE2C6F4807B349827DCDBDD1F2EFA885A2630 -rand```   _This is the main script to search for 1 pubkey using the files created earlier._
 - ```python bsgs_dll_search.py -pfile Pub50.txt -b bpfile.bin -bl bloomfile.bin -rand1```   _This is the main script to search for multi pubkey using the files created earlier._
+- Option ```rand``` and ```rand1``` is personal choice. rand changes the base key randomly after each n items while rand1 does it only first time.
 
 ***Note: Think about How much RAM your system has free which you are going to allow to use in this script.
 For Example 1 billion items will require 5GB bloom file and therefore 5GB for running the final script. So plan accordingly during creation of bPfile and bloomfile.***
@@ -92,6 +93,5 @@ PVK not found. 15.00000 PetaKeys scanned in 12.74 sec. New range [+] k1: 0xf721b
 **IceLand**
 ```
 BTC:	bc1q39meky2mn5qjq704zz0nnkl0v7kj4uz6r529at
-ETH:	0xa74fC23f07A33B90d6848dF0bb409bEA5Ac16b28
 DOGE:	D5Wh5bQMc3XVGdLbjJbGjryjNom5tZY6dD
 ```
