@@ -15,6 +15,7 @@ import os
 import math
 import sys
 import argparse
+import secrets
 import secp256k1 as ice
 
 
@@ -80,15 +81,22 @@ lastitem = 0
 
 
 ###############################################################################
-
-# Very Very Slow. Made only to get a random number completely non pseudo stl.
+# Speed test: Generating 10K random values using the 3 methods - original random:1.5791 seconds - secrets: 0.0312 seconds - os.urandom:0.0156 seconds
 def randk(a, b):
     if flag_random:
-        dd = list(str(random.randint(1,2**256)))
-        random.shuffle(dd); random.shuffle(dd)
-        rs = int(''.join(dd))
-        random.seed(rs)
-        return random.SystemRandom().randint(a, b)
+        return secrets.randbelow(b - a + 1) + a
+	    
+ #      Other option using os
+        #RandomBytes = os.urandom(4)                        # Retrieves 2^8 per byte => 256^4 for 4 bytes
+        #RandomINT = int.from_bytes(RandomBytes, 'big') 
+        #return a + (RandomINT % (b - a + 1))
+
+#       Very Very Slow. Made only to get a random number completely non pseudo stl.
+        #dd = list(str(random.randint(1,2**256)))           
+        #random.shuffle(dd); random.shuffle(dd)
+        #rs = int(''.join(dd))
+        #random.seed(rs)
+        #return random.SystemRandom().randint(a, b)
     else:
         if lastitem == 0:
             return a
